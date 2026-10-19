@@ -11,6 +11,7 @@ import com.bookit.reservation.history.domain.ReservationHistory;
 import com.bookit.reservation.history.domain.ReservationHistoryRepository;
 import com.bookit.reservation.history.domain.ReservationHistoryType;
 import com.bookit.reservation.history.dto.ReservationHistoryResponse;
+import com.bookit.reservation.notification.application.ReservationNotificationService;
 import com.bookit.reservation.slot.domain.ReservationSlot;
 import com.bookit.reservation.slot.domain.ReservationSlotRepository;
 import java.time.LocalDateTime;
@@ -26,17 +27,20 @@ public class ReservationService {
     private final ReservationSlotRepository reservationSlotRepository;
     private final MemberRepository memberRepository;
     private final ReservationHistoryRepository reservationHistoryRepository;
+    private final ReservationNotificationService reservationNotificationService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationSlotRepository reservationSlotRepository,
             MemberRepository memberRepository,
-            ReservationHistoryRepository reservationHistoryRepository
+            ReservationHistoryRepository reservationHistoryRepository,
+            ReservationNotificationService reservationNotificationService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationSlotRepository = reservationSlotRepository;
         this.memberRepository = memberRepository;
         this.reservationHistoryRepository = reservationHistoryRepository;
+        this.reservationNotificationService = reservationNotificationService;
     }
 
     @Transactional
@@ -61,6 +65,7 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.save(new Reservation(member, slot));
         reservationHistoryRepository.save(new ReservationHistory(reservation, ReservationHistoryType.CREATED));
+        reservationNotificationService.scheduleReminder(reservation);
         return ReservationResponse.from(reservation);
     }
 
@@ -84,6 +89,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
         reservation.cancel();
         reservationHistoryRepository.save(new ReservationHistory(reservation, ReservationHistoryType.CANCELLED));
+        reservationNotificationService.cancelScheduledReminder(reservationId);
     }
 
     private Member getMember(String email) {

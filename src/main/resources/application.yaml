@@ -21,6 +21,8 @@ reservation:
   redis-lock:
     wait-ms: 300
     lease-ms: 5000
+  reminder:
+    fixed-delay-ms: 60000
 
 jwt:
   secret: ${JWT_SECRET:Ym9va2l0LWRldmVsb3BtZW50LXNlY3JldC1rZXktMzItYnl0ZXM=}

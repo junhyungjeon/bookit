@@ -8,6 +8,7 @@ Spring Boot 기반 예약 서비스입니다. 단순 예약 CRUD를 넘어서, �
 - 서비스와 예약 가능 시간(슬롯) 관리
 - 예약 생성, 조회, 취소
 - 예약 생성/취소 이력 저장
+- 예약 24시간 전 알림 예약 및 스케줄러 처리
 - 비관적 락, 낙관적 락, Redis 분산 락 기반 예약 API
 - Docker Compose로 Spring Boot, MySQL, Redis 실행
 
@@ -49,3 +50,11 @@ Docker의 MySQL은 PC에 직접 설치한 MySQL과 별도의 데이터베이스�
 ## CI
 
 GitHub의 `main` 또는 `master` 브랜치에 push하거나 Pull Request를 만들면 GitHub Actions가 Java 21 환경에서 `./mvnw test`를 자동 실행합니다.
+
+## 예약 알림
+
+예약이 생성되면 예약 시간 24시간 전을 발송 시각으로 하는 알림이 `reservation_notification` 테이블에 `SCHEDULED` 상태로 저장됩니다. 스케줄러는 1분마다 발송 시각이 지난 알림을 처리하고 `SENT`로 바꿉니다. 현재는 서버 로그 기록 방식이며, 이후 이메일·SMS·푸시 서비스 연동 지점으로 확장할 수 있습니다.
+
+```text
+GET /api/reservations/me/notifications
+```

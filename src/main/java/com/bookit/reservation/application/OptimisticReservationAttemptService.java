@@ -10,6 +10,7 @@ import com.bookit.reservation.dto.ReservationResponse;
 import com.bookit.reservation.history.domain.ReservationHistory;
 import com.bookit.reservation.history.domain.ReservationHistoryRepository;
 import com.bookit.reservation.history.domain.ReservationHistoryType;
+import com.bookit.reservation.notification.application.ReservationNotificationService;
 import com.bookit.reservation.slot.domain.ReservationSlot;
 import com.bookit.reservation.slot.domain.ReservationSlotRepository;
 import java.time.LocalDateTime;
@@ -23,17 +24,20 @@ public class OptimisticReservationAttemptService {
     private final ReservationSlotRepository reservationSlotRepository;
     private final MemberRepository memberRepository;
     private final ReservationHistoryRepository reservationHistoryRepository;
+    private final ReservationNotificationService reservationNotificationService;
 
     public OptimisticReservationAttemptService(
             ReservationRepository reservationRepository,
             ReservationSlotRepository reservationSlotRepository,
             MemberRepository memberRepository,
-            ReservationHistoryRepository reservationHistoryRepository
+            ReservationHistoryRepository reservationHistoryRepository,
+            ReservationNotificationService reservationNotificationService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationSlotRepository = reservationSlotRepository;
         this.memberRepository = memberRepository;
         this.reservationHistoryRepository = reservationHistoryRepository;
+        this.reservationNotificationService = reservationNotificationService;
     }
 
     @Transactional
@@ -60,6 +64,7 @@ public class OptimisticReservationAttemptService {
         slot.recordReservationAttempt();
         Reservation reservation = reservationRepository.save(new Reservation(member, slot));
         reservationHistoryRepository.save(new ReservationHistory(reservation, ReservationHistoryType.CREATED));
+        reservationNotificationService.scheduleReminder(reservation);
         return ReservationResponse.from(reservation);
     }
 }

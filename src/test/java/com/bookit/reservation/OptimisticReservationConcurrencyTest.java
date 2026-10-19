@@ -9,6 +9,7 @@ import com.bookit.reservation.domain.ReservationRepository;
 import com.bookit.reservation.domain.ReservationStatus;
 import com.bookit.reservation.dto.ReservationCreateRequest;
 import com.bookit.reservation.history.domain.ReservationHistoryRepository;
+import com.bookit.reservation.notification.domain.ReservationNotificationRepository;
 import com.bookit.reservation.slot.domain.ReservationSlot;
 import com.bookit.reservation.slot.domain.ReservationSlotRepository;
 import com.bookit.service.domain.Service;
@@ -33,6 +34,7 @@ class OptimisticReservationConcurrencyTest {
     @Autowired private OptimisticReservationService optimisticReservationService;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ReservationHistoryRepository reservationHistoryRepository;
+    @Autowired private ReservationNotificationRepository reservationNotificationRepository;
     @Autowired private ReservationSlotRepository reservationSlotRepository;
     @Autowired private ServiceRepository serviceRepository;
     @Autowired private MemberRepository memberRepository;
@@ -40,6 +42,7 @@ class OptimisticReservationConcurrencyTest {
 
     @AfterEach
     void cleanUp() {
+        reservationNotificationRepository.deleteAll();
         reservationHistoryRepository.deleteAll();
         reservationRepository.deleteAll();
         reservationSlotRepository.deleteAll();

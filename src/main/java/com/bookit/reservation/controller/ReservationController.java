@@ -6,6 +6,8 @@ import com.bookit.reservation.application.RedisReservationService;
 import com.bookit.reservation.dto.ReservationCreateRequest;
 import com.bookit.reservation.dto.ReservationResponse;
 import com.bookit.reservation.history.dto.ReservationHistoryResponse;
+import com.bookit.reservation.notification.application.ReservationNotificationService;
+import com.bookit.reservation.notification.dto.ReservationNotificationResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -26,15 +28,18 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final OptimisticReservationService optimisticReservationService;
     private final RedisReservationService redisReservationService;
+    private final ReservationNotificationService reservationNotificationService;
 
     public ReservationController(
             ReservationService reservationService,
             OptimisticReservationService optimisticReservationService,
-            RedisReservationService redisReservationService
+            RedisReservationService redisReservationService,
+            ReservationNotificationService reservationNotificationService
     ) {
         this.reservationService = reservationService;
         this.optimisticReservationService = optimisticReservationService;
         this.redisReservationService = redisReservationService;
+        this.reservationNotificationService = reservationNotificationService;
     }
 
     @PostMapping
@@ -67,6 +72,11 @@ public class ReservationController {
     @GetMapping("/me")
     public List<ReservationResponse> findMyReservations(@AuthenticationPrincipal String email) {
         return reservationService.findMyReservations(email);
+    }
+
+    @GetMapping("/me/notifications")
+    public List<ReservationNotificationResponse> findMyNotifications(@AuthenticationPrincipal String email) {
+        return reservationNotificationService.findMyNotifications(email);
     }
 
     @GetMapping("/{reservationId}/history")
