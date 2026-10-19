@@ -33,6 +33,16 @@ MySQL을 실행한 뒤 Eclipse에서 `BookitApplication`을 **Run As → Java Ap
 http://localhost:8080/api/health
 ```
 
+## API 문서
+
+서버 실행 후 Swagger UI에서 API 목록, 요청 형식, 응답을 확인하고 직접 호출할 수 있습니다.
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+JWT가 필요한 API는 Swagger UI 우측 상단의 `Authorize`에서 로그인 응답의 access token을 입력합니다.
+
 ## Docker 실행
 
 ```powershell
