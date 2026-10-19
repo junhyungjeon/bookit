@@ -1,5 +1,7 @@
 package com.bookit.reservation.slot.application;
 
+import com.bookit.reservation.domain.ReservationRepository;
+import com.bookit.reservation.domain.ReservationStatus;
 import com.bookit.reservation.slot.domain.ReservationSlot;
 import com.bookit.reservation.slot.domain.ReservationSlotRepository;
 import com.bookit.reservation.slot.dto.ReservationSlotCreateRequest;
@@ -17,10 +19,16 @@ public class ReservationSlotService {
 
     private final ReservationSlotRepository reservationSlotRepository;
     private final ServiceRepository serviceRepository;
+    private final ReservationRepository reservationRepository;
 
-    public ReservationSlotService(ReservationSlotRepository reservationSlotRepository, ServiceRepository serviceRepository) {
+    public ReservationSlotService(
+            ReservationSlotRepository reservationSlotRepository,
+            ServiceRepository serviceRepository,
+            ReservationRepository reservationRepository
+    ) {
         this.reservationSlotRepository = reservationSlotRepository;
         this.serviceRepository = serviceRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     @Transactional
@@ -33,12 +41,15 @@ public class ReservationSlotService {
         }
 
         ReservationSlot slot = new ReservationSlot(service, request.startAt(), request.endAt(), request.capacity());
-        return ReservationSlotResponse.from(reservationSlotRepository.save(slot));
+        return ReservationSlotResponse.from(reservationSlotRepository.save(slot), 0);
     }
 
     public List<ReservationSlotResponse> findAllByService(Long serviceId) {
         return reservationSlotRepository.findAllByServiceIdOrderByStartAtAsc(serviceId).stream()
-                .map(ReservationSlotResponse::from)
+                .map(slot -> ReservationSlotResponse.from(
+                        slot,
+                        reservationRepository.countBySlotIdAndStatus(slot.getId(), ReservationStatus.CONFIRMED)
+                ))
                 .toList();
     }
 

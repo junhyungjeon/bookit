@@ -8,14 +8,21 @@ public record ReservationSlotResponse(
         Long serviceId,
         LocalDateTime startAt,
         LocalDateTime endAt,
-        int capacity
+        int capacity,
+        long reservedCount,
+        long remainingCapacity,
+        boolean available
 ) {
-    public static ReservationSlotResponse from(ReservationSlot slot) {
+    public static ReservationSlotResponse from(ReservationSlot slot, long reservedCount) {
+        long remainingCapacity = Math.max(slot.getCapacity() - reservedCount, 0);
         return new ReservationSlotResponse(
                 slot.getId(),
                 slot.getService().getId(),
                 slot.getStartAt(),
                 slot.getEndAt(),
-                slot.getCapacity());
+                slot.getCapacity(),
+                reservedCount,
+                remainingCapacity,
+                remainingCapacity > 0);
     }
 }

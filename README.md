@@ -6,6 +6,7 @@ Spring Boot 기반 예약 서비스입니다. 단순 예약 CRUD를 넘어서, �
 
 - JWT 기반 회원가입, 로그인, 내 정보 조회
 - 서비스와 예약 가능 시간(슬롯) 관리
+- 슬롯별 전체 정원·예약 완료 수·남은 좌석·예약 가능 여부 조회
 - 예약 생성, 조회, 취소
 - 예약 생성/취소 이력 저장
 - 예약 24시간 전 알림 예약 및 스케줄러 처리
@@ -57,4 +58,21 @@ GitHub의 `main` 또는 `master` 브랜치에 push하거나 Pull Request를 만�
 
 ```text
 GET /api/reservations/me/notifications
+```
+
+## 예약 가능 인원 조회
+
+서비스의 슬롯 목록을 조회하면 취소된 예약을 제외한 예약 완료 수와 남은 좌석을 함께 반환합니다.
+
+```text
+GET /api/services/{serviceId}/slots
+```
+
+```json
+{
+  "capacity": 1,
+  "reservedCount": 0,
+  "remainingCapacity": 1,
+  "available": true
+}
 ```
